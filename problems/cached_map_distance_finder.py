@@ -32,7 +32,7 @@ class CachedMapDistanceFinder:
             self.nr_cache_misses += 1
         return key in self._cache
 
-    def get_map_cost_between(self, src_junction: Junction, tgt_junction: Junction) -> Optional[Cost]:
+    def get_map_cost_between(self, src_junction: Junction, tgt_junction: Junction) -> object:
         """
         TODO [Ex.17]: Implement this method!
         If the distance for the given source & target junctions is already stored in the cache, just return it.
@@ -45,5 +45,16 @@ class CachedMapDistanceFinder:
          access the `_cache` field directly.
         The cache key should include the source & target indices.
         """
-
-        raise NotImplementedError  # TODO: remove this line!
+        couple_tuple_key = (src_junction.index, tgt_junction.index)
+        if self._is_in_cache(couple_tuple_key):
+            return self._get_from_cache(couple_tuple_key)
+        else:
+            map_problem = MapProblem(self.streets_map, src_junction.index, tgt_junction.index)
+            res = self.map_problem_solver(map_problem)
+            if res.is_solution_found:
+                self._insert_to_cache(couple_tuple_key, None)
+                return None
+            else:
+                cost = res.solution_g_cost
+                self._insert_to_cache(couple_tuple_key, cost)
+                return cost
