@@ -98,6 +98,7 @@ def toy_map_problem_experiments():
 
     # Ex.10
     # TODO: Just run it and inspect the printed result.
+    print('using uniform cost')
     toy_map_problem = MapProblem(streets_map, 54, 549)
     uc = UniformCost()
     res = uc.solve_problem(toy_map_problem)
@@ -108,7 +109,12 @@ def toy_map_problem_experiments():
     #       solve the same `toy_map_problem` with it and print the results (as before).
     # Notice: AStar constructor receives the heuristic *type* (ex: `MyHeuristicClass`),
     #         and NOT an instance of the heuristic (eg: not `MyHeuristicClass()`).
-    exit()  # TODO: remove!
+    print('using A* with null hueristic.')
+
+    toy_map_problem = MapProblem(streets_map, 54, 549)
+    a_st = AStar(NullHeuristic)
+    res = a_st.solve_problem(toy_map_problem)
+    print(res)
 
     # Ex.13
     # TODO: create an instance of `AStar` with the `AirDistHeuristic`,
