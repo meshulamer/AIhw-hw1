@@ -232,8 +232,8 @@ class MDAProblem(GraphProblem):
                 new_state = MDAState(lab, frozenset(), state_to_expand.tests_transferred_to_lab.union(
                     state_to_expand.tests_on_ambulance)
                                      , state_to_expand.nr_matoshim_on_ambulance
-                                     + lab.max_nr_matoshim*state_to_expand.visited_labs.__contains__(lab),
-                                     state_to_expand.visited_labs.union(frozenset(lab)))
+                                     + (lab.max_nr_matoshim)*(1-state_to_expand.visited_labs.__contains__(lab)),
+                                     state_to_expand.visited_labs.union(frozenset([lab])))
                 yield OperatorResult(new_state, self.get_operator_cost(state_to_expand, new_state),
                                      "go to lab " + lab.name)
 
@@ -279,7 +279,7 @@ class MDAProblem(GraphProblem):
         distance_between_nodes = self.map_distance_finder.get_map_cost_between(
             prev_state.current_location, succ_state.current_location)
         if distance_between_nodes is None:
-            return MDACost(float('inf'), float('inf'), float('inf'))
+            return MDACost(float('inf'), float('inf'), float('inf'), self.optimization_objective)
         tests_on_me = prev_state.get_total_nr_tests_taken_and_stored_on_ambulance()
         gasPrice =self.problem_input.gas_liter_price
         drive_cons = self.problem_input.ambulance.drive_gas_consumption_liter_per_meter
@@ -287,20 +287,17 @@ class MDAProblem(GraphProblem):
         active_fridges = math.ceil(active_fridges)
         fridge_cons = sum(self.problem_input.ambulance.fridges_gas_consumption_liter_per_meter[:active_fridges])
         ambulance_fees = gasPrice * (fridge_cons + drive_cons) * distance_between_nodes
-        lab_fees=0
+        lab_fees = 0
         if isinstance(succ_state.current_site, Laboratory):
-            if len(prev_state.tests_on_ambulance) == 0:
-                lab_fees = 0
-            else:
-                lab_fees = succ_state.current_site.tests_transfer_cost
-            if succ_state.visited_labs.__contains__(succ_state.current_site):
-                lab_fees+=succ_state.current_site.revisit_extra_cost
+            if len(prev_state.tests_on_ambulance) > 0:
+                lab_fees += succ_state.current_site.tests_transfer_cost
+                if prev_state.visited_labs.__contains__(succ_state.current_site):
+                    lab_fees += succ_state.current_site.revisit_extra_cost
         monetary = lab_fees + ambulance_fees
 
         test_travel_distance_cost = tests_on_me * distance_between_nodes
 
-        return MDACost(distance_between_nodes, monetary, test_travel_distance_cost)
-
+        return MDACost(distance_between_nodes, monetary, test_travel_distance_cost, self.optimization_objective)
 
     def is_goal(self, state: GraphProblemState) -> bool:
         """
@@ -310,7 +307,7 @@ class MDAProblem(GraphProblem):
          In order to create a set from some other collection (list/tuple) you can just `set(some_other_collection)`.
         """
         assert isinstance(state, MDAState)
-        return state.tests_transferred_to_lab == self.problem_input.reported_apartments
+        return state.tests_transferred_to_lab == frozenset(self.problem_input.reported_apartments)
 
 
     def get_zero_cost(self) -> Cost:
@@ -339,7 +336,7 @@ class MDAProblem(GraphProblem):
             Note: This method can be implemented using a single line of code. Try to do so.
         """
 
-        return sorted(list(set(self.problem_input.reported_apartments)\
+        return sorted(list(frozenset(self.problem_input.reported_apartments)\
                     .difference(state.tests_on_ambulance.union(state.tests_transferred_to_lab))), key=(lambda a: a.report_id))
 
 

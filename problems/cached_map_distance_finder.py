@@ -50,8 +50,9 @@ class CachedMapDistanceFinder:
             return self._get_from_cache(couple_tuple_key)
         else:
             map_problem = MapProblem(self.streets_map, src_junction.index, tgt_junction.index)
-            res = self.map_problem_solver(map_problem)
-            if res.is_solution_found:
+            res = self.map_problem_solver.solve_problem(map_problem)
+
+            if not res.is_solution_found:
                 self._insert_to_cache(couple_tuple_key, None)
                 return None
             else:

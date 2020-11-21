@@ -75,14 +75,14 @@ class AStar(BestFirstSearch):
         """
         if self.open.has_state(successor_node.state): #If I found the node in the open list
             already_found_node_with_same_state = self.open.get_node_by_state(successor_node.state)
-            if self._calc_node_expanding_priority(already_found_node_with_same_state) > self._calc_node_expanding_priority(successor_node):
+            if already_found_node_with_same_state.g_cost > successor_node.g_cost:
                 self.open.extract_node(already_found_node_with_same_state)
             if not self.open.has_state(successor_node.state):
                 self.open.push_node(successor_node)
 
         elif self.close.has_state(successor_node.state): #We havent found the Node in open. Maybe in close?
             already_found_node_with_same_state = self.close.get_node_by_state(successor_node.state)
-            if self._calc_node_expanding_priority(already_found_node_with_same_state) > self._calc_node_expanding_priority(successor_node):
+            if already_found_node_with_same_state.g_cost > successor_node.g_cost:
                 self.close.remove_node(already_found_node_with_same_state)
                 self.open.push_node(successor_node)
         else:

@@ -120,7 +120,6 @@ class Junction:
         serialized_links = ','.join(link.serialize() for link in self.outgoing_links)
         return f'{self.index},{self.lat},{self.lon},' + serialized_links
 
-
 class StreetsMap(Dict[int, Junction]):
     """
     The StreetsMap is basically a dictionary fro junction index to the Junction object.
