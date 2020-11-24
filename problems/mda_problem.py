@@ -337,7 +337,7 @@ class MDAProblem(GraphProblem):
         """
 
         return sorted(list(frozenset(self.problem_input.reported_apartments)\
-                    .difference(state.tests_on_ambulance.union(state.tests_transferred_to_lab))), key=(lambda a: a.report_id))
+                    .difference(state.tests_on_ambulance.union(state.tests_transferred_to_lab))), key=lambda a: a.report_id)
 
 
     def get_all_certain_junctions_in_remaining_ambulance_path(self, state: MDAState) -> List[Junction]:
@@ -350,4 +350,5 @@ class MDAProblem(GraphProblem):
             Use the method `self.get_reported_apartments_waiting_to_visit(state)`.
             Use python's `sorted(some_list, key=...)` function.
         """
-        raise NotImplementedError  # TODO: remove this line!
+        junction_list = [apt.location for apt in self.get_reported_apartments_waiting_to_visit(state)] + [state.current_location]
+        return sorted(junction_list, key=lambda x: x.index)
