@@ -105,8 +105,26 @@ class MDASumAirDistHeuristic(HeuristicFunction):
 
         if len(all_certain_junctions_in_remaining_ambulance_path) < 2:
             return 0
+        total_path_sum = 0
+        all_certain_junctions_in_remaining_ambulance_path.remove(state.current_location)
+        current_loc = state.current_location
+        next_loc = None
+        while len(all_certain_junctions_in_remaining_ambulance_path) > 0:
+            current_min_distance = float('inf')
+            current_min_junction_index = float('inf')
+            for j in all_certain_junctions_in_remaining_ambulance_path:
+                dist = self.cached_air_distance_calculator.get_air_distance_between_junctions(current_loc, j)
+                if dist < current_min_distance or dist == current_min_distance and j.index < current_min_junction_index:
+                    current_min_distance = dist
+                    current_min_junction_index = j.index
+                    next_loc = j
+            assert(current_min_distance != float('inf'))
+            total_path_sum += current_min_distance
+            current_loc = next_loc
+            all_certain_junctions_in_remaining_ambulance_path.remove(current_loc)
 
-        raise NotImplementedError  # TODO: remove this line and complete the missing part here!
+        return total_path_sum
+
 
 
 class MDAMSTAirDistHeuristic(HeuristicFunction):
@@ -144,8 +162,16 @@ class MDAMSTAirDistHeuristic(HeuristicFunction):
               Use `nx.minimum_spanning_tree()` to get an MST. Calculate the MST size using the method
               `.size(weight='weight')`. Do not manually sum the edges' weights.
         """
-        raise NotImplementedError  # TODO: remove this line!
-
+        graph = nx.empty_graph()
+        for junction in junctions:
+            graph.add_node(junction.index)
+        for j1 in junctions:
+            for j2 in junctions:
+                if j1.index < j2.index:
+                    graph.add_edge(j1.index, j2.index, weight=self.cached_air_distance_calculator.
+                                   get_air_distance_between_junctions(j1, j2))
+        min_tree = nx.minimum_spanning_tree(graph)
+        return min_tree.size(weight='weight')
 
 class MDATestsTravelDistToNearestLabHeuristic(HeuristicFunction):
     heuristic_name = 'MDA-TimeObjectiveSumOfMinAirDistFromLab'

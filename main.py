@@ -5,6 +5,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 from typing import List, Union, Optional
 
+
 # Load the streets map
 streets_map = StreetsMap.load_from_csv(Consts.get_data_file_path("tlv_streets_map.csv"))
 
@@ -208,17 +209,20 @@ def mda_problem_with_astar_experiments():
     print(res)
 
 
-    exit()  # TODO: remove!
 
     # Ex.25
     # TODO: create an instance of `AStar` with the `MDASumAirDistHeuristic`,
     #       solve the `moderate_mda_problem_with_distance_cost` with it and print the results.
-    exit()  # TODO: remove!
+    MDASumAirDistHeuristicAstar = AStar(MDASumAirDistHeuristic)
+    res = MDASumAirDistHeuristicAstar.solve_problem(moderate_mda_problem_with_distance_cost)
+    print(res)
 
     # Ex.28
     # TODO: create an instance of `AStar` with the `MDAMSTAirDistHeuristic`,
     #       solve the `moderate_mda_problem_with_distance_cost` with it and print the results.
-    exit()  # TODO: remove!
+    MDAMSTAirDistHeuristicAstar = AStar(MDAMSTAirDistHeuristic)
+    res = MDAMSTAirDistHeuristicAstar.solve_problem(moderate_mda_problem_with_distance_cost)
+    print(res)
 
 
 def mda_problem_with_weighted_astar_experiments():
@@ -232,13 +236,13 @@ def mda_problem_with_weighted_astar_experiments():
     # TODO: Call here the function `run_astar_for_weights_in_range()`
     #       with `MDAMSTAirDistHeuristic`
     #       over the `small_mda_problem_with_distance_cost`.
-    exit()  # TODO: remove!
+    run_astar_for_weights_in_range(MDAMSTAirDistHeuristic, small_mda_problem_with_distance_cost)
 
     # Ex.30
     # TODO: Call here the function `run_astar_for_weights_in_range()`
     #       with `MDASumAirDistHeuristic`
     #       over the `moderate_mda_problem_with_distance_cost`.
-    exit()  # TODO: remove!
+    run_astar_for_weights_in_range(MDASumAirDistHeuristic, moderate_mda_problem_with_distance_cost)
 
 
 def monetary_cost_objectives_mda_problem_experiments():
